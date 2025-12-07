@@ -1,19 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatDividerModule } from '@angular/material/divider';
-import { QuestionService } from '../../services/question.service';
+import { QuestionHelper } from '../../helper/question.helper';
+
 import { TrainingService } from '../../services/training.service';
+import { QuestionService } from '../../services/question.service';
 import { QuestionModel, FeedbackModel, TrainingSessionModel } from '../../models';
-import { FeedbackCardComponent } from '../feedback-card/feedback-card.component';
+import { MarkdownPipe } from '../../pipes/markdown.pipe';
+import { QuestionCardComponent } from '../question-card/question-card.component';
 
 @Component({
   selector: 'app-practice',
@@ -21,28 +23,47 @@ import { FeedbackCardComponent } from '../feedback-card/feedback-card.component'
   imports: [
     CommonModule,
     FormsModule,
-    MatCardModule,
-    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatCardModule,
+    MarkdownPipe,
     MatChipsModule,
-    MatDividerModule,
-    FeedbackCardComponent
+    QuestionCardComponent
   ],
   templateUrl: './practice.component.html',
-  styleUrl: './practice.component.scss'
+  styleUrls: ['./practice.component.scss']
 })
 export class PracticeComponent implements OnInit {
+
+  @ViewChild('textareaElement') textareaElement!: ElementRef<HTMLTextAreaElement>;
+
+  // Current question
   question: QuestionModel | null = null;
-  textAnswer = '';
+  textAnswer: string = '';
+
+  // All questions for sidebar
+  allQuestions: QuestionModel[] = [];
+  visibleQuestionsCount = 2; // Number of cards visible at once
+  currentScrollIndex = 0; // Starting index for visible questions
+
+  feedbackHtml: string = '';
   feedback: FeedbackModel | null = null;
+
   isLoading = false;
-  isSubmitting = false;
   errorMessage = '';
-  isRecording = false;
-  audioBlob: Blob | null = null;
+  isSubmitting = false;
+  loadAnswer = false;
+  copyText: string = "העתק";
+  typingInterval: any;
+
+
+  // Voice
+  isListening = false;
+  recognizedText = '';
+  recognition: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -51,48 +72,58 @@ export class PracticeComponent implements OnInit {
     private trainingService: TrainingService
   ) {}
 
-  // Initializes component and loads the selected question
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadQuestion();
-  };
+  }
 
-  // Fetches the question based on route parameter
-  loadQuestion = (): void => {
-    const questionId = Number(this.route.snapshot.paramMap.get('id'));
-    if (!questionId) {
+  // ------------------------------------------------------------
+  // Load selected question by ID
+  // ------------------------------------------------------------
+  loadQuestion(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (!id) {
       this.router.navigate(['/questions']);
       return;
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
 
     this.questionService.getAllQuestions().subscribe({
-      next: (questions) => {
-        this.question = questions.find(q => q.id === questionId) || null;
+      next: questions => {
+        this.allQuestions = questions;
+        this.question = questions.find(q => q.id === id) || null;
+        
+        this.isLoading = false;
+
         if (!this.question) {
-          this.errorMessage = 'Question not found.';
+          this.errorMessage = 'לא נמצא תרחיש מתאים.';
           this.router.navigate(['/questions']);
+        } else {
+          // Set scroll index to show current question
+          const currentIndex = this.allQuestions.findIndex(q => q.id === id);
+          if (currentIndex !== -1) {
+            this.currentScrollIndex = Math.max(0, currentIndex - 1);
+          }
         }
-        this.isLoading = false;
       },
-      error: (error) => {
-        this.errorMessage = 'Failed to load question. Please try again.';
+      error: err => {
+        console.error(err);
+        this.errorMessage = 'שגיאה בטעינת התרחיש.';
         this.isLoading = false;
-        console.error('Error loading question:', error);
       }
     });
-  };
+  }
 
-  // Submits the text answer for evaluation
-  submitAnswer = (): void => {
-    if (!this.textAnswer.trim() || !this.question) {
-      return;
-    }
+  // ------------------------------------------------------------
+  // Submit Answer → ChatGPT typing effect
+  // ------------------------------------------------------------
+  submitAnswer(): void {
+    if (!this.textAnswer.trim() || !this.question) return;
 
-    this.isSubmitting = true;
-    this.errorMessage = '';
+    this.feedbackHtml = '';
     this.feedback = null;
+    this.isSubmitting = true;
+    this.loadAnswer = true;
 
     const session: TrainingSessionModel = {
       questionId: this.question.id,
@@ -101,79 +132,179 @@ export class PracticeComponent implements OnInit {
     };
 
     this.trainingService.submitAnswer(session).subscribe({
-      next: (feedback) => {
-        this.feedback = feedback;
-        this.isSubmitting = false;
+      next: feedback => {
+        const text = feedback.rawResponse ?? JSON.stringify(feedback, null, 2);
+        this.startTypingEffect(text);
       },
-      error: (error) => {
-        this.errorMessage = 'Failed to submit answer. Please try again.';
+      error: err => {
+        console.error(err);
+        this.loadAnswer = false;
         this.isSubmitting = false;
-        console.error('Error submitting answer:', error);
+        this.feedbackHtml = 'אירעה שגיאה בשליחת התשובה.';
       }
     });
-  };
+  }
 
-  // Starts recording audio answer
-  startRecording = (): void => {
-    this.isRecording = true;
-    // TODO: Implement audio recording functionality
-    console.log('Audio recording started');
-  };
+  startTypingEffect(fullText: string): void {
+    let index = 0;
+    this.feedbackHtml = '';
+    this.isSubmitting = false;
 
-  // Stops recording and saves the audio blob
-  stopRecording = (): void => {
-    this.isRecording = false;
-    // TODO: Implement audio recording stop and blob capture
-    console.log('Audio recording stopped');
-  };
+    this.typingInterval = setInterval(() => {
+      this.feedbackHtml += fullText[index];
+      index++;
 
-  // Submits the audio answer for evaluation
-  submitAudioAnswer = (): void => {
-    if (!this.audioBlob || !this.question) {
+      if (index >= fullText.length) {
+        clearInterval(this.typingInterval);
+        this.loadAnswer = false;
+      }
+    }, 12);
+  }
+
+  stopTyping(): void {
+    clearInterval(this.typingInterval);
+    this.loadAnswer = false;
+  }
+
+  // ------------------------------------------------------------
+  // Voice Input
+  // ------------------------------------------------------------
+  startVoiceInput(): void {
+    this.isListening = true;
+    this.recognizedText = '';
+
+    const SpeechRecognition =
+      (window as any).webkitSpeechRecognition ||
+      (window as any).SpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert('הדפדפן לא תומך בזיהוי קולי');
+      this.isListening = false;
       return;
     }
 
-    this.isSubmitting = true;
-    this.errorMessage = '';
-    this.feedback = null;
+    this.recognition = new SpeechRecognition();
+    this.recognition.lang = 'he-IL';
+    this.recognition.interimResults = false;
 
-    this.trainingService.submitAudioAnswer(this.question.id, this.audioBlob).subscribe({
-      next: (feedback) => {
-        this.feedback = feedback;
-        this.isSubmitting = false;
-      },
-      error: (error) => {
-        this.errorMessage = 'Failed to submit audio answer. Please try again.';
-        this.isSubmitting = false;
-        console.error('Error submitting audio answer:', error);
-      }
-    });
-  };
+    this.recognition.onresult = (event: any) => {
+      this.recognizedText = event.results[0][0].transcript;
+    };
 
-  // Resets the practice session for the current question
-  resetPractice = (): void => {
-    this.textAnswer = '';
-    this.feedback = null;
-    this.audioBlob = null;
-    this.errorMessage = '';
-  };
+    this.recognition.onerror = () => {
+      this.isListening = false;
+    };
 
-  // Navigates back to the question list
-  goBack = (): void => {
-    this.router.navigate(['/questions']);
-  };
+    this.recognition.start();
+  }
 
-  // Returns the color class for difficulty chip
-  getDifficultyColor = (difficulty: string): string => {
-    switch (difficulty) {
-      case 'easy':
-        return 'difficulty-easy';
-      case 'medium':
-        return 'difficulty-medium';
-      case 'hard':
-        return 'difficulty-hard';
-      default:
-        return '';
+  confirmVoice(): void {
+    if (this.recognizedText.trim()) {
+      this.textAnswer += (this.textAnswer ? ' ' : '') + this.recognizedText;
+      this.adjustTextareaHeight();
     }
-  };
+    if (this.recognition) this.recognition.stop();
+    this.isListening = false;
+  }
+
+  cancelVoice(): void {
+    if (this.recognition) this.recognition.stop();
+    this.isListening = false;
+    this.recognizedText = '';
+  }
+
+  // ------------------------------------------------------------
+  // Input helpers
+  // ------------------------------------------------------------
+  handleEnterKey(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      if (this.textAnswer.trim() && !this.isSubmitting) {
+        this.submitAnswer();
+      }
+    }
+  }
+
+  copyResponse(): void {
+    navigator.clipboard.writeText(this.feedbackHtml || '')
+      .catch(err => console.error('Copy failed:', err));
+      this.copyText = "הועתק!"
+      setTimeout(() => {
+        this.copyText = "העתק"
+      }, 2000);
+  }
+
+  adjustTextareaHeight(): void {
+    const tx = this.textareaElement.nativeElement;
+    tx.style.height = 'auto';
+    tx.style.height = Math.min(tx.scrollHeight, 200) + 'px';
+  }
+
+    // Returns color class for difficulty chip
+    getDifficultyColor(difficulty: string): string {
+      return QuestionHelper.getDifficultyColor(difficulty);
+    }
+
+  goBack(): void {
+    this.router.navigate(['/questions']);
+  }
+
+  // ------------------------------------------------------------
+  // Questions Sidebar Navigation
+  // ------------------------------------------------------------
+  
+  // Get visible questions for carousel
+  get visibleQuestions(): QuestionModel[] {
+    return this.allQuestions.slice(
+      this.currentScrollIndex,
+      this.currentScrollIndex + this.visibleQuestionsCount
+    );
+  }
+
+  // Check if can scroll previous
+  get canScrollPrev(): boolean {
+    return this.currentScrollIndex > 0;
+  }
+
+  // Check if can scroll next
+  get canScrollNext(): boolean {
+    return this.currentScrollIndex + this.visibleQuestionsCount < this.allQuestions.length;
+  }
+
+  // Scroll to previous questions
+  scrollPrev(): void {
+    if (this.canScrollPrev) {
+      this.currentScrollIndex--;
+    }
+  }
+
+  // Scroll to next questions
+  scrollNext(): void {
+    if (this.canScrollNext) {
+      this.currentScrollIndex++;
+    }
+  }
+
+  // Select a different question from sidebar
+  selectQuestion(questionId: number): void {
+    if (this.question?.id === questionId) return; // Already selected
+
+    // Reset current state
+    this.textAnswer = '';
+    this.feedbackHtml = '';
+    this.feedback = null;
+    this.isSubmitting = false;
+    this.loadAnswer = false;
+    
+    // Navigate to new question
+    this.router.navigate(['/practice', questionId]).then(() => {
+      // Reload the question
+      this.loadQuestion();
+    });
+  }
+
+  // Check if question is currently selected
+  isQuestionSelected(questionId: number): boolean {
+    return this.question?.id === questionId;
+  }
 }

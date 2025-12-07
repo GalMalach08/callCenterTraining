@@ -1,10 +1,88 @@
+@use '@angular/material' as mat;
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@include mat.core();
+
+
 html, body {
   height: 100%;
 }
 
 body {
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: 'Assistant', 'Helvetica Neue', sans-serif !important;
   background-color: #fafafa;
 }
 
+.difficulty-easy {
+        background: #66bb6a !important;
+        color: white;
+      }
 
+.difficulty-medium {
+        background: #ffa726 !important;
+        color: white;
+      }
+
+.difficulty-hard {
+        background: #ef5350 !important;
+        color: white;
+}
+
+.primary-btn {
+  margin-top: 10px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  letter-spacing: 0.3px;
+background: linear-gradient(135deg, #1565c0, #42a5f5) !important;
+  color: white !important;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 10px rgba(25, 118, 210, 0.25) !important;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(25, 118, 210, 0.35);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+
+    mat-card-header {
+    color:black;
+      margin-bottom: 0.8rem;
+      padding: 10px !important;
+      display: block !important;
+      .card-title {
+        width: 100%;
+        display: flex;
+        gap: 1rem;
+             align-items: flex-start;
+        justify-content: space-between;
+        .title {
+         h3 {
+      font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0px;
+        }
+        .sub-title {
+        opacity: 0.6;
+        }
+        }
+
+      .chips-container mat-chip {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 8px;
+      }
+
+      }
+    }

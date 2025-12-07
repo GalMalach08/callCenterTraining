@@ -11,8 +11,9 @@ import { QuestionModel } from '../../models';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-  import {MatSelectModule} from '@angular/material/select';
-
+import { MatSelectModule } from '@angular/material/select';
+import { QuestionHelper } from '../../helper/question.helper';
+import { QuestionCardComponent } from '../question-card/question-card.component';
 
 @Component({
   selector: 'app-question-list',
@@ -27,44 +28,62 @@ import { MatInputModule } from '@angular/material/input';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    QuestionCardComponent
   ],
-
   templateUrl: './question-list.component.html',
   styleUrls: ['./question-list.component.scss']
 })
 export class QuestionListComponent implements OnInit {
+
   questions: QuestionModel[] = [];
+
   isLoading = false;
   errorMessage = '';
-  searchText: string = '';
-  difficultyFilter: string = '';
+
+  searchText = '';
+  difficultyFilter = '';
+
+  difficultyLevels = [
+    { code: '', name: 'הכול' },
+    { code: 'קל', name: 'קל' },
+    { code: 'בינוני', name: 'בינוני' },
+    { code: 'קשה', name: 'קשה' }
+  ];
+    // רשימת קטגוריות ייחודיות
+  categories: string[] = [];
+
+  // הקטגוריות שנבחרו בפילטר
+  selectedCategories: string[] = [];
   constructor(
     private questionService: QuestionService,
     private router: Router
   ) {}
 
   // Initializes component and loads all questions
-  ngOnInit() {    
+  ngOnInit() {
     this.loadQuestions();
-  };
+  }
 
   // Fetches all questions from the service
   loadQuestions = (): void => {
-    console.log('eeee');
-    
     this.isLoading = true;
     this.errorMessage = '';
 
     this.questionService.getAllQuestions().subscribe({
       next: (questions) => {
-        console.log(questions);
-        
         this.questions = questions;
+          this.categories = Array.from(
+    new Set(
+      this.questions
+        .map(q => q.category)
+        .filter(cat => !!cat)
+    )
+  );
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = 'Failed to load questions. Please try again.';
+        this.errorMessage = 'שגיאה, נא לנסות שנית בטעינת התרחישים';
         this.isLoading = false;
         console.error('Error loading questions:', error);
       }
@@ -76,38 +95,44 @@ export class QuestionListComponent implements OnInit {
     this.router.navigate(['/practice', questionId]);
   };
 
-
-
-    get filteredQuestions(): QuestionModel[] {
-      return this.questions.filter(q => {
-        const matchesDifficulty =
-          !this.difficultyFilter || q.difficulty === this.difficultyFilter;
-
-        const text = this.searchText.toLowerCase();
-
-        const matchesText =
-          !text ||
-          q.title.toLowerCase().includes(text) ||
-          q.description.toLowerCase().includes(text) ||
-          q.scenario.toLowerCase().includes(text) ||
-          q.category.toLowerCase().includes(text);
-
-        return matchesDifficulty && matchesText;
-      });
-    }
-
-
-  // Returns the color class for difficulty chip
-  getDifficultyColor = (difficulty: string): string => {
-    switch (difficulty) {
-      case 'easy':
-        return 'difficulty-easy';
-      case 'medium':
-        return 'difficulty-medium';
-      case 'hard':
-        return 'difficulty-hard';
-      default:
-        return '';
-    }
+  // Sets difficulty filter
+  setDifficulty = (level: string): void => {
+    this.difficultyFilter = level;
   };
+
+  // Returns color class for difficulty chip
+  getDifficultyColor(difficulty: string): string {
+    return QuestionHelper.getDifficultyColor(difficulty);
+  }
+
+  // Reset all filters
+  resetFilters = (): void => {
+    this.searchText = '';
+    this.difficultyFilter = '';
+    this.selectedCategories = [];
+
+  };
+
+  // Filtered questions getter
+  get filteredQuestions(): QuestionModel[] {
+  return this.questions.filter(q => {
+    const matchesDifficulty =
+      !this.difficultyFilter || q.difficulty === this.difficultyFilter;
+
+    const text = this.searchText.toLowerCase();
+    const matchesText =
+      !text ||
+      q.title.toLowerCase().includes(text) ||
+      q.description.toLowerCase().includes(text) ||
+      q.scenario.toLowerCase().includes(text) ||
+      q.category.toLowerCase().includes(text);
+
+    const matchesCategory =
+      this.selectedCategories.length === 0 ||
+      this.selectedCategories.includes(q.category);
+
+    return matchesDifficulty && matchesText && matchesCategory;
+  });
+}
+
 }

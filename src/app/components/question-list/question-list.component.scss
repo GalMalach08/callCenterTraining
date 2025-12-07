@@ -1,183 +1,219 @@
-// .question-list-container {
-//   padding: 2rem;
-//   max-width: 1600px;
-//   margin: 0 auto;
-//   direction: rtl;
+.question-list-container {
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  direction: rtl;
 
-//   .header {
-//     text-align: center;
-//     margin-bottom: 2.5rem;
+  .header {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: #1565c0;
+      margin: 0;
+    }
 
-//     h1 {
-//       font-size: 2.2rem;
-//       font-weight: 600;
-//       color: #1565c0;
-//       margin: 0;
-//     }
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.7;
+      margin-top: 0.5rem;
+    }
+  }
 
-//     .subtitle {
-//       font-size: 1rem;
-//       opacity: 0.7;
-//       margin-top: 0.5rem;
-//     }
-//   }
+  .filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    direction: rtl;
 
-//   /* 🎯 Loading + Error */
-//   .loading-container,
-//   .error-container {
+}
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+}
+
+
+
+
+  /* 🎯 Loading + Error */
+  .loading-container,
+  .error-container {
     
-//     text-align: center;
-//     padding: 3rem 0;
+    text-align: center;
+    padding: 3rem 0;
 
-//     p {
-//       margin-top: 1rem;
-//       opacity: 0.7;
-//     }
+    p {
+      margin-top: 1rem;
+      opacity: 0.7;
+    }
 
-//     mat-icon {
-//       font-size: 48px;
-//       margin-bottom: 0.5rem;
-//     }
-//   }
+    mat-icon {
+      font-size: 48px;
+      margin-bottom: 0.5rem;
+    }
+  }
 
-//   /* 🎯 Grid of Cards */
-//   .questions-grid {
-//     display: grid;
-//     gap: 1.5rem;
-//     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-//   }
+  /* 🎯 Grid of Cards */
+  .questions-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
 
-//   .question-card {
-//     border-radius: 14px;
-//     padding-bottom: 0.5rem;
-//     background: white;
-//     transition: all 0.25s ease;
-//     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  // Question card styles moved to question-card.component.scss
 
-//     &:hover {
-//       transform: translateY(-3px);
-//       box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-//     }
+  .empty-state {
 
-//     mat-card-header {
-//       margin-bottom: 0.8rem;
+  padding: 3rem 0;
+  min-height: 250px; /* 🟢 מונע חיתוך */
+  opacity: 0.7;
 
-//       mat-card-title {
-//         font-size: 1.2rem;
-//         font-weight: 600;
-//       }
+  mat-icon {
+    font-size: 64px;
+    height: 64px;      /* 🟢 חובה */
+    width: 64px;       /* 🟢 חובה */
+    line-height: 64px; /* 🟢 מוודא שהאייקון לא קופץ למעלה */
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-//       mat-card-subtitle {
-//         opacity: 0.6;
-//       }
-//     }
+  p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+}
 
-//     mat-card-content {
-//       display: flex;
-//       flex-direction: column;
-//       gap: 0.8rem;
-//     flex: 1;        // דוחף את ה-actions לתחתית
-      
-//       .chips-container mat-chip {
-//         font-size: 0.75rem;
-//         font-weight: 600;
-//         padding: 4px 10px;
-//         border-radius: 8px;
-//       }
+}
 
-//       .difficulty-easy {
-//         background: #66bb6a !important;
-//         color: white;
-//       }
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .question-list-container {
+    padding: 1rem;
 
-//       .difficulty-medium {
-//         background: #ffa726 !important;
-//         color: white;
-//       }
+    .header h1 {
+      font-size: 1.8rem;
+    }
+  }
+}
 
-//       .difficulty-hard {
-//         background: #ef5350 !important;
-//         color: white;
-//       }
 
-//       .description {
-//         opacity: 0.8;
-//       }
 
-//       .scenario-preview {
-//         background: #f9fafb;
-//         padding: 0.8rem;
-//         border-radius: 8px;
-//         font-size: 0.9rem;
+    .filter-section {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      .filter-label {
+        font-weight: 500;
+        color: #555;
+      }
 
-//         strong {
-//           margin-bottom: 0.4rem;
-//           display: block;
-//         }
+        // Input field width
+.input-field {
+  height: 40px; 
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
 
-//         p {
-//           margin: 0;
-//           opacity: 0.75;
-//         }
-//       }
-//     }
+  ::ng-deep input.mat-input-element {
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 40px;
+    line-height: 40px;
+  }
+  .cancel-icon {
+    color: rgb(243, 87, 87);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0px 6px;
 
-//     mat-card-actions {
-//       display: flex;
-//       justify-content: flex-start;
-//       padding: 0.5rem 1rem 1rem;
+    
+  }
+}
 
-//       button mat-icon {
-//         margin-left: 0.4rem;
-//       }
-//     }
-//   }
 
-//   /* 🎯 Empty State */
-//   .empty-state {
-//     text-align: center;
-//     padding: 4rem 0;
-//     opacity: 0.6;
+   .difficulty-chips {
+        display: flex;
+        gap: 0.5rem;
+        ::ng-deep {
+          .info.mat-mdc-chip-selected {
+            background-color: #2196f3 !important;
+            color: white !important;
+          }
 
-//     mat-icon {
-//       font-size: 64px;
-//       margin-bottom: 1rem;
-//     }
-//   }
-// }
+         
+      }
+    }
+  }
 
-// /* 📱 Mobile */
-// @media (max-width: 768px) {
-//   .question-list-container {
-//     padding: 1rem;
 
-//     .header h1 {
-//       font-size: 1.8rem;
-//     }
-//   }
-// }
 
-// .primary-btn {
-//   margin-top: 10px;
-//   padding: 0.7rem 1.2rem;
-//   font-size: 1rem;
-//   font-weight: 600;
-//   border-radius: 12px;
-//   letter-spacing: 0.3px;
-// background: linear-gradient(135deg, #1565c0, #42a5f5);
-//   color: white;
-//   display: flex;
-//   align-items: center;
-//   gap: 0.4rem;
-//   transition: all 0.25s ease;
-//   box-shadow: 0 4px 10px rgba(25, 118, 210, 0.25);
+/* Wrapper for all difficulty items */
+.difficulty-wrapper {
+  display: flex;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+    height: 36px; /* Fixes the height to compact size */
 
-//   &:hover {
-//     transform: translateY(-2px);
-//     box-shadow: 0 6px 16px rgba(25, 118, 210, 0.35);
-//   }
+}
 
-//   &:active {
-//     transform: scale(0.97);
-//   }
-// }
+/* Each difficulty chip-like item */
+.difficulty-item {
+  // flex: 1;
+  padding: 10px 14px;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+
+  transition: background 0.2s ease, color 0.2s ease;
+
+  /* Vertical divider between items */
+  border-right: 1px solid #dcdcdc;
+}
+
+/* Remove divider from last item */
+.difficulty-item:last-child {
+  border-right: none;
+}
+
+/* Hover effect */
+.difficulty-item:hover {
+  background: #f3f3f3;
+}
+
+/* Style for selected item */
+.difficulty-item.selected {
+background: linear-gradient(135deg, #1565c0, #42a5f5);
+  color: white;
+  font-weight: bold;
+}
+
+/* Check icon inside selected chip */
+.check-icon {
+  font-size: 18px;
+  margin-right: 6px;
+}
+
+  // רקע לבן לחלון הבחירה
+  ::ng-deep .mat-mdc-select-panel {
+    background: #ffffff !important;
+  }
