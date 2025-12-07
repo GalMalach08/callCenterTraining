@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "title": "Handling an Angry Customer",
+    "description": "Practice de-escalating a situation with an upset customer",
+    "category": "Conflict Resolution",
+    "difficulty": "medium",
+    "scenario": "A customer calls in very upset because their internet service has been down for 3 days. They are threatening to cancel their service and leave negative reviews. They are raising their voice and using harsh language.",
+    "keyPoints": [
+      "Remain calm and empathetic",
+      "Apologize for the inconvenience",
+      "Acknowledge their frustration",
+      "Offer a concrete solution",
+      "Provide timeline for resolution"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Product Return Process",
+    "description": "Guide a customer through the return process",
+    "category": "Customer Service",
+    "difficulty": "easy",
+    "scenario": "A customer wants to return a product they purchased online 10 days ago. The product doesn't match the description on the website. They have the original packaging and receipt.",
+    "keyPoints": [
+      "Verify purchase date and eligibility",
+      "Explain return policy clearly",
+      "Provide step-by-step instructions",
+      "Offer return label or shipping options",
+      "Set expectations for refund timing"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Technical Support - Password Reset",
+    "description": "Help a customer reset their account password",
+    "category": "Technical Support",
+    "difficulty": "easy",
+    "scenario": "A customer is locked out of their account after multiple failed login attempts. They cannot remember their password and don't have access to the recovery email address.",
+    "keyPoints": [
+      "Verify customer identity",
+      "Explain security procedures",
+      "Offer alternative verification methods",
+      "Guide through password reset process",
+      "Provide tips for password management"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Upselling Additional Services",
+    "description": "Practice identifying upselling opportunities",
+    "category": "Sales",
+    "difficulty": "hard",
+    "scenario": "A customer calls to ask about their current plan. They mention they're working from home now and need better internet speed. They seem satisfied with your service but are concerned about costs.",
+    "keyPoints": [
+      "Listen for customer needs",
+      "Ask qualifying questions",
+      "Present relevant upgrade options",
+      "Highlight value and benefits",
+      "Address cost concerns proactively"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Billing Dispute Resolution",
+    "description": "Handle a customer disputing charges on their bill",
+    "category": "Billing",
+    "difficulty": "hard",
+    "scenario": "A customer received a bill that is $50 higher than usual. They claim they didn't use any additional services and believe there's an error. They're asking for an immediate refund and threatening to escalate to management.",
+    "keyPoints": [
+      "Review account history thoroughly",
+      "Explain charges clearly",
+      "Investigate potential errors",
+      "Offer solutions or adjustments",
+      "Document the interaction properly"
+    ]
+  },
+  {
+    "id": 6,
+    "title": "New Customer Onboarding",
+    "description": "Welcome and set up a new customer account",
+    "category": "Onboarding",
+    "difficulty": "medium",
+    "scenario": "A new customer has just signed up for your service and is calling for help with initial setup. They're not very tech-savvy and seem overwhelmed by the process.",
+    "keyPoints": [
+      "Welcome warmly and build rapport",
+      "Use simple, non-technical language",
+      "Provide step-by-step guidance",
+      "Confirm understanding at each step",
+      "Offer additional resources"
+    ]
+  }
+]

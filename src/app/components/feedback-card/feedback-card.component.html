@@ -1,0 +1,75 @@
+<mat-card class="feedback-card" *ngIf="feedback">
+  <mat-card-header>
+    <div class="header-content">
+      <div class="title-section">
+        <mat-icon class="feedback-icon">assessment</mat-icon>
+        <mat-card-title>AI Evaluation Results</mat-card-title>
+      </div>
+      <div class="score-badge" [ngClass]="getScoreColor()">
+        <div class="score-value">{{ feedback.score }}</div>
+        <div class="score-label">{{ getPerformanceLabel() }}</div>
+      </div>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="feedback-section strengths-section" *ngIf="feedback.strengths && feedback.strengths.length > 0">
+      <h3>
+        <mat-icon class="section-icon success">check_circle</mat-icon>
+        Strengths
+      </h3>
+      <ul>
+        <li *ngFor="let strength of feedback.strengths">{{ strength }}</li>
+      </ul>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="feedback-section weaknesses-section" *ngIf="feedback.weaknesses && feedback.weaknesses.length > 0">
+      <h3>
+        <mat-icon class="section-icon warning">info</mat-icon>
+        Areas for Improvement
+      </h3>
+      <ul>
+        <li *ngFor="let weakness of feedback.weaknesses">{{ weakness }}</li>
+      </ul>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="feedback-section suggestions-section" *ngIf="feedback.suggestions && feedback.suggestions.length > 0">
+      <h3>
+        <mat-icon class="section-icon info">lightbulb</mat-icon>
+        Recommendations
+      </h3>
+      <ul>
+        <li *ngFor="let suggestion of feedback.suggestions">{{ suggestion }}</li>
+      </ul>
+    </div>
+
+    <div class="raw-response" *ngIf="feedback.rawResponse">
+      <mat-divider></mat-divider>
+      <h3>
+        <mat-icon class="section-icon">comment</mat-icon>
+        Additional Notes
+      </h3>
+      <p>{{ feedback.rawResponse }}</p>
+    </div>
+
+    <div class="timestamp" *ngIf="feedback.evaluatedAt">
+      <mat-icon>schedule</mat-icon>
+      <span>Evaluated on {{ feedback.evaluatedAt | date:'medium' }}</span>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-raised-button color="primary" (click)="onTryAgain()">
+      <mat-icon>refresh</mat-icon>
+      Try Again
+    </button>
+    <button mat-button>
+      <mat-icon>download</mat-icon>
+      Download Report
+    </button>
+  </mat-card-actions>
+</mat-card>

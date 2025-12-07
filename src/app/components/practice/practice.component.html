@@ -1,0 +1,126 @@
+<div class="practice-container">
+  <div class="navigation-header">
+    <button mat-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Scenarios
+    </button>
+  </div>
+
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+    <p>Loading scenario...</p>
+  </div>
+
+  <div class="error-container" *ngIf="errorMessage && !question">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ errorMessage }}</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      Return to Scenarios
+    </button>
+  </div>
+
+  <div class="practice-content" *ngIf="!isLoading && question">
+    <mat-card class="question-card">
+      <mat-card-header>
+        <mat-card-title>{{ question.title }}</mat-card-title>
+        <mat-card-subtitle>{{ question.category }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="chips-container">
+          <mat-chip-set>
+            <mat-chip [class]="getDifficultyColor(question.difficulty)">
+              {{ question.difficulty | uppercase }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+
+        <div class="scenario-section">
+          <h3><mat-icon>assignment</mat-icon> Scenario</h3>
+          <p>{{ question.scenario }}</p>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="key-points-section" *ngIf="question.keyPoints && question.keyPoints.length > 0">
+          <h3><mat-icon>checklist</mat-icon> Key Focus Areas</h3>
+          <ul>
+            <li *ngFor="let point of question.keyPoints">{{ point }}</li>
+          </ul>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="answer-card">
+      <mat-card-header>
+        <mat-card-title>Your Response</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="answer-section">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Type your answer here</mat-label>
+            <textarea 
+              matInput 
+              [(ngModel)]="textAnswer" 
+              rows="10"
+              placeholder="How would you handle this situation? Write your response as if you're speaking to the customer..."
+              [disabled]="isSubmitting"
+            ></textarea>
+            <mat-hint>Be professional, empathetic, and solution-focused</mat-hint>
+          </mat-form-field>
+
+          <div class="audio-section">
+            <p class="audio-label">
+              <mat-icon>mic</mat-icon>
+              Or record an audio response (Coming Soon)
+            </p>
+            <div class="audio-controls">
+              <button 
+                mat-raised-button 
+                [color]="isRecording ? 'warn' : 'accent'"
+                (click)="isRecording ? stopRecording() : startRecording()"
+                disabled
+              >
+                <mat-icon>{{ isRecording ? 'stop' : 'mic' }}</mat-icon>
+                {{ isRecording ? 'Stop Recording' : 'Start Recording' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-message" *ngIf="errorMessage && question">
+          <mat-icon color="warn">error</mat-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="submitAnswer()"
+          [disabled]="!textAnswer.trim() || isSubmitting"
+        >
+          <mat-icon>send</mat-icon>
+          {{ isSubmitting ? 'Submitting...' : 'Submit for Evaluation' }}
+        </button>
+
+        <button 
+          mat-button 
+          (click)="resetPractice()"
+          [disabled]="isSubmitting"
+        >
+          <mat-icon>refresh</mat-icon>
+          Reset
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <app-feedback-card 
+      *ngIf="feedback" 
+      [feedback]="feedback"
+      (tryAgain)="resetPractice()"
+    ></app-feedback-card>
+  </div>
+</div>

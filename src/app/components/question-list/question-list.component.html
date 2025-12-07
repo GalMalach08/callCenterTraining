@@ -1,0 +1,81 @@
+<div class="question-list-container">
+  <div class="header">
+    <h1>תרחישי תרגול למוקדנים</h1>
+    <p class="subtitle">נא לבחור תרחיש כדי להתחיל תרגול</p>
+  </div>
+
+
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+    <p>Loading scenarios...</p>
+  </div>
+
+  <div class="error-container" *ngIf="errorMessage">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ errorMessage }}</p>
+    <button mat-raised-button color="primary" (click)="loadQuestions()">
+      <mat-icon>refresh</mat-icon>
+      Retry
+    </button>
+  </div>
+
+  <div class="filters">
+  <mat-form-field appearance="outline">
+    <mat-label>חיפוש...</mat-label>
+    <input matInput [(ngModel)]="searchText" placeholder="הקלד טקסט לחיפוש">
+    <button *ngIf="searchText" mat-icon-button matSuffix (click)="searchText=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>רמת קושי</mat-label>
+    <mat-select [(ngModel)]="difficultyFilter">
+      <mat-option value="">הכל</mat-option>
+      <mat-option value="easy">קל</mat-option>
+      <mat-option value="medium">בינוני</mat-option>
+      <mat-option value="hard">קשה</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+
+  <div class="questions-grid" *ngIf="!isLoading && !errorMessage">
+    <mat-card *ngFor="let question of filteredQuestions" class="question-card">
+      <mat-card-header>
+        <mat-card-title>{{ question.title }}</mat-card-title>
+        <mat-card-subtitle>{{ question.category }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="chips-container">
+          <mat-chip-set>
+            <mat-chip [class]="getDifficultyColor(question.difficulty)">
+              {{ question.difficulty | uppercase }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+
+        <p class="description">{{ question.description }}</p>
+
+        <div class="scenario-preview">
+          <strong>Scenario:</strong>
+          <p>{{ question.scenario }}</p>
+        </div>
+
+
+      </mat-card-content>
+
+      <mat-card-actions>
+      <button mat-raised-button color="primary" class="primary-btn" (click)="selectQuestion(question.id)">
+        התחלת תרגול
+      </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && !errorMessage && questions.length === 0">
+    <mat-icon>inbox</mat-icon>
+    <p>No scenarios available at this time.</p>
+  </div>
+</div>
