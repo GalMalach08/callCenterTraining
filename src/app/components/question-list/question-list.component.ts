@@ -105,6 +105,11 @@ export class QuestionListComponent implements OnInit {
     return QuestionHelper.getDifficultyColor(difficulty);
   }
 
+    // Translates difficulty to Hebrew
+  translateDifficulty(difficulty: string): string {
+    return QuestionHelper.translateDifficulty(difficulty);
+  }
+
   // Reset all filters
   resetFilters = (): void => {
     this.searchText = '';
@@ -117,15 +122,10 @@ export class QuestionListComponent implements OnInit {
   get filteredQuestions(): QuestionModel[] {
   return this.questions.filter(q => {
     const matchesDifficulty =
-      !this.difficultyFilter || q.difficulty === this.difficultyFilter;
+      !this.difficultyFilter || this.translateDifficulty(q.difficulty) === this.difficultyFilter;
 
     const text = this.searchText.toLowerCase();
-    const matchesText =
-      !text ||
-      q.title.toLowerCase().includes(text) ||
-      q.description.toLowerCase().includes(text) ||
-      q.scenario.toLowerCase().includes(text) ||
-      q.category.toLowerCase().includes(text);
+    const matchesText =!text || q.title.toLowerCase().includes(text);
 
     const matchesCategory =
       this.selectedCategories.length === 0 ||

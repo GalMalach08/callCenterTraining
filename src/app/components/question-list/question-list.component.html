@@ -14,7 +14,7 @@
     <div class="filter-section">
       <span class="filter-label">חיפוש:</span>
       <mat-form-field appearance="outline" class="input-field">
-        <input matInput [(ngModel)]="searchText" placeholder="הקלד טקסט לחיפוש">
+        <input matInput [(ngModel)]="searchText" placeholder="טקסט חופשי">
         <mat-icon *ngIf="searchText" matSuffix (click)="searchText=''" class="cancel-icon">
           close
         </mat-icon>
@@ -24,12 +24,11 @@
     <!-- Category filter -->
 <div class="filter-section">
   <span class="filter-label">סינון לפי קטגוריה:</span>
-
   <mat-form-field appearance="outline" class="input-field">
     <mat-select
       [(ngModel)]="selectedCategories"
       multiple
-      placeholder="בחר קטגוריות" >
+      placeholder="בחירת קטגוריות" >
       <mat-option *ngFor="let cat of categories" [value]="cat">
         {{ cat }}
       </mat-option>

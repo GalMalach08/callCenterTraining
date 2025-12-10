@@ -73,6 +73,11 @@ export class QuestionCardComponent implements OnInit, OnDestroy {
   getDifficultyColor(difficulty: string): string {
     return QuestionHelper.getDifficultyColor(difficulty);
   }
+  
+  // Translates difficulty to Hebrew
+  translateDifficulty(difficulty: string): string {
+    return QuestionHelper.translateDifficulty(difficulty);
+  }
 
   // Handles card click
   onCardClick(): void {

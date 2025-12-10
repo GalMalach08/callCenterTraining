@@ -1,241 +1,176 @@
-<div class="practice-container">
+<div class="main-container">
+  <div class="practice-container">
+    <div class="practice-content" *ngIf="!isLoading && question">
 
-  <!-- Loading state -->
-  <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner></mat-spinner>
-    <p>טוען תרחיש...</p>
-  </div>
+      <!-- ========================= -->
+      <!-- Question Header Section   -->
+      <!-- ========================= -->
+      <div class="question-details">
+        <mat-card-header>
+          <mat-card-title class="card-title">
 
-  <!-- Error state when question not found -->
-  <div class="error-container" *ngIf="errorMessage && !question">
-    <mat-icon color="warn">error</mat-icon>
-    <p>{{ errorMessage }}</p>
-    <button mat-raised-button color="primary" (click)="goBack()">
-      חזרה לרשימת תרחישים
-    </button>
-  </div>
+            <div class="title">
+              <div class="main-title">
+                <!-- Back button -->
+                <button mat-icon-button   matTooltip="חזרה לרשימת השאלות"  class="back-btn"(click)="goBack()" >
+                  <mat-icon>arrow_forward</mat-icon>
+                </button>
+                <h3>{{ question.title }}</h3>
+              </div>
 
-  <!-- Main content when question is loaded -->
-  <div class="practice-content" *ngIf="!isLoading && question">
-
-    <!-- ========================= -->
-    <!-- Question Header Section  -->
-    <!-- ========================= -->
-    <div class="question-details">
-
-      <mat-card-header>
-        <mat-card-title class="card-title">
-
-          <!-- Title + Back button -->
-          <div class="title">
-            <div class="main-title">
-
-              <!-- Back to questions list -->
-              <button
-                mat-icon-button
-                class="back-btn"
-                (click)="goBack()"
-                matTooltip="חזור לרשימת תרחישים">
-                <mat-icon>arrow_forward</mat-icon>
-              </button>
-
-              <h3>{{ question.title }}</h3>
+              <p class="sub-title">{{ question.category }}</p>
             </div>
 
-            <!-- Category label -->
-            <span class="sub-title">
-           <button 
-  mat-icon-button 
-  class="back-btn" 
-  [style.visibility]="'hidden'">
-  <mat-icon>arrow_forward</mat-icon>
-</button>
+            <!-- Difficulty chip -->
+            <div class="chips-container">
+              <mat-chip-set>
+                <mat-chip [class]="getDifficultyColor(question.difficulty)">
+                  {{ translateDifficulty(question.difficulty) }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
 
-              {{ question.category }}</span>
-          </div>
-
-          <!-- Difficulty chip -->
-          <div class="chips-container">
-            <mat-chip-set>
-              <mat-chip [class]="getDifficultyColor(question.difficulty)">
-                {{ question.difficulty | uppercase }}
-              </mat-chip>
-            </mat-chip-set>
-          </div>
-
-        </mat-card-title>
-      </mat-card-header>
-
-      <!-- Scenario details -->
-      <div class="scenario-card">
-        <h3>תרחיש</h3>
-        <p>{{ question.description }}</p>
-        <p>{{ question.scenario }}</p>
+          </mat-card-title>
+        </mat-card-header>
       </div>
+      <!-- END Question Header -->
 
-    </div>
+      <!-- ========================= -->
+      <!-- ChatGPT-Style Answer UI   -->
+      <!-- ========================= -->
+      <div class="chat-section">
 
-    <!-- ========================= -->
-    <!-- ChatGPT-Like Answer UI -->
-    <!-- ========================= -->
-    <div class="chat-section">
+        <!-- Input Bar -->
+        <div class="input-bar">
+          <mat-form-field appearance="outline" class="prompt-field">
 
-      <!-- ========== Input Bar ========== -->
-      <div class="input-bar">
+            <textarea matInput [(ngModel)]="textAnswer" #textareaElement
+                      (input)="adjustTextareaHeight()" (keydown)="handleEnterKey($event)"
+                      rows="2" placeholder="כתוב את תשובתך כאן..."
+                      [disabled]="isSubmitting"></textarea>
 
-        <!-- Text input field -->
-        <mat-form-field appearance="outline" class="prompt-field">
+            <!-- Buttons -->
+            <div matSuffix class="chatgpt-buttons">
 
-          <!-- User answer textarea -->
-          <textarea
-            matInput
-            [(ngModel)]="textAnswer"
-            #textareaElement
-            (input)="adjustTextareaHeight()"
-            (keydown)="handleEnterKey($event)"
-            rows="2"
-            placeholder="כתוב את תשובתך כאן..."
-            [disabled]="isSubmitting">
-          </textarea>
+              <!-- Normal Mode -->
+              <ng-container *ngIf="!isListening; else recordMode">
 
-          <!-- Action buttons (mic, send, stop) -->
-          <div matSuffix class="chatgpt-buttons">
+                <!-- Mic -->
+                <button class="mic-button fix-icon-btn" matTooltip="הקלטה קולית"
+                        (click)="startVoiceInput()" [disabled]="isSubmitting">
+                  <mat-icon>mic</mat-icon>
+                </button>
 
-            <!-- Normal mode (not recording) -->
-            <ng-container *ngIf="!isListening; else recordMode">
+                <!-- Send -->
+                <button class="send-button fix-icon-btn" (click)="submitAnswer()"
+                        *ngIf="!loadAnswer" [disabled]="!textAnswer.trim() || isSubmitting">
+                  <mat-icon>arrow_upward</mat-icon>
+                </button>
 
-              <!-- Start voice recording -->
-              <button class="mic-button" (click)="startVoiceInput()" matTooltip="הקלטה קולית">
-                <mat-icon>mic</mat-icon>
-              </button>
+                <!-- Stop typing -->
+                <button class="abort-button fix-icon-btn" *ngIf="isSubmitting" (click)="resetAnswer()">
+                  <mat-icon>stop</mat-icon>
+                </button>
 
-              <!-- Submit button -->
-              <button
-                class="send-button"
-                (click)="submitAnswer()"
-                [disabled]="!textAnswer.trim() || isSubmitting"
-                *ngIf="!loadAnswer">
-                <mat-icon>arrow_upward</mat-icon>
-              </button>
+              </ng-container>
 
-              <!-- Stop typing animation -->
-              <button class="abort-button" *ngIf="loadAnswer" (click)="stopTyping()">
-                <mat-icon>stop</mat-icon>
-              </button>
+              <!-- Recording Mode -->
+              <ng-template #recordMode>
+                <div class="recording-field">
 
-            </ng-container>
+                  <textarea matInput [value]="recognizedText" rows="2" readonly></textarea>
 
-            <!-- Recording mode UI -->
-            <ng-template #recordMode>
-              <div class="recording-field">
+                  <div class="confirm-buttons-inline">
 
-                <!-- Recorded text preview -->
-                <textarea matInput [value]="recognizedText" rows="2" readonly></textarea>
+                    <button class="cancel-button fix-icon-btn" (click)="cancelVoice()">
+                      <mat-icon>close</mat-icon>
+                    </button>
 
-                <!-- Confirm/Cancel voice input -->
-                <div class="confirm-buttons-inline">
+                    <button class="confirm-button fix-icon-btn" (click)="confirmVoice()">
+                      <mat-icon>check</mat-icon>
+                    </button>
 
-                  <button class="cancel-button" (click)="cancelVoice()">
-                    <mat-icon>close</mat-icon>
-                  </button>
-
-                  <button class="confirm-button" (click)="confirmVoice()">
-                    <mat-icon>check</mat-icon>
-                  </button>
-
+                  </div>
                 </div>
-              </div>
-            </ng-template>
+              </ng-template>
 
-          </div>
-        </mat-form-field>
-      </div>
-
-      <!-- ========== AI Feedback Box ========== -->
-      <div class="response-box" *ngIf="feedbackHtml || loadAnswer">
-
-        <!-- Feedback header (title + copy button) -->
-        <div class="response-header sticky-header">
-          <h3>משוב AI</h3>
-
-          <button mat-button (click)="copyResponse()" matTooltip="העתק">
-            {{ copyText }}
-            <mat-icon>content_copy</mat-icon>
-          </button>
+            </div>
+          </mat-form-field>
         </div>
 
-        <!-- Feedback content with fade animation -->
-        <div [class.fade-in]="!loadAnswer">
+        <!-- ========================= -->
+        <!-- AI Feedback Box          -->
+        <!-- ========================= -->
+        <div class="response-box" *ngIf="feedbackHtml || loadAnswer">
 
-          <!-- Loading animation -->
-          <ng-container *ngIf="loadAnswer; else showFeedback">
+          <div class="response-header sticky-header">
+            <h3>משוב AI</h3>
+
+            <button mat-button (click)="copyResponse()" matTooltip="העתק">
+              {{ copyText }}
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </div>
+
+          <!-- Loading -->
+          <ng-container *ngIf="loadAnswer">
             <span class="loading-dot"></span>
           </ng-container>
 
-          <!-- Render processed feedback -->
-          <ng-template #showFeedback>
-            <div class="response-html" [innerHTML]="feedbackHtml | markdownToHtml"></div>
-          </ng-template>
-
-        </div>
-
-      </div>
-
-    </div>
-    <!-- END ChatGPT UI -->
-
-    <!-- ========================= -->
-    <!-- Questions Sidebar Carousel -->
-    <!-- ========================= -->
-    <div class="questions-sidebar" *ngIf="allQuestions.length > 0">
-      
-      <div class="sidebar-header">
-        <h3>תרחישים נוספים לתרגול</h3>
-        <span class="questions-count">{{ allQuestions.length }} תרחישים</span>
-      </div>
-
-      <div class="carousel-container">
-        
-        <!-- Previous button -->
-        <button 
-          mat-icon-button 
-          class="carousel-btn prev-btn"
-          [disabled]="!canScrollPrev"
-          (click)="scrollPrev()"
-          matTooltip="תרחיש קודם">
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-
-        <!-- Questions cards carousel -->
-        <div class="carousel-track">
-          <div 
-            class="carousel-item"
-            *ngFor="let q of visibleQuestions"
-            [class.selected]="isQuestionSelected(q.id)">
-            
-            <app-question-card
-              [question]="q"
-              [buttonText]="isQuestionSelected(q.id) ? 'נבחר' : 'בחר תרחיש'"
-              (actionClick)="selectQuestion($event)">
-            </app-question-card>
-
+          <!-- Fade In Answer -->
+          <div *ngIf="!loadAnswer"
+              class="response-html fade-in"
+              [innerHTML]="feedbackHtml | markdownToHtml">
           </div>
+
         </div>
 
-        <!-- Next button -->
-        <button 
-          mat-icon-button 
-          class="carousel-btn next-btn"
-          [disabled]="!canScrollNext"
-          (click)="scrollNext()"
-          matTooltip="תרחיש הבא">
-          <mat-icon>chevron_left</mat-icon>
-        </button>
+      </div>
+      <!-- END Chat Section -->
+
+      <!-- ========================= -->
+      <!-- Questions Sidebar        -->
+      <!-- ========================= -->
+      <div class="questions-sidebar" *ngIf="allQuestions.length > 0">
+
+        <div class="sidebar-header">
+          <h3>תרחישים נוספים לתרגול</h3>
+          <span class="questions-count">{{ allQuestions.length }} תרחישים</span>
+        </div>
+
+        <div class="carousel-container">
+
+          <!-- Prev -->
+          <button mat-icon-button disableRipple class="carousel-btn  prev-btn"
+                  [disabled]="!canScrollPrev" (click)="scrollPrev()" matTooltip="תרחיש קודם">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+
+          <!-- Cards -->
+          <div class="carousel-track">
+            <div *ngFor="let q of visibleQuestions"
+                 class="carousel-item"
+                 [class.selected]="isQuestionSelected(q.id)">
+
+              <app-question-card [question]="q"
+                                 [buttonText]="isQuestionSelected(q.id) ? 'נבחר' : 'בחר תרחיש'"
+                                 (actionClick)="selectQuestion($event)">
+              </app-question-card>
+
+            </div>
+          </div>
+
+          <!-- Next -->
+          <button mat-icon-button disableRipple class="carousel-btn next-btn"
+                  [disabled]="!canScrollNext" (click)="scrollNext()" matTooltip="תרחיש הבא">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+        </div>
 
       </div>
+      <!-- END Questions Sidebar -->
 
     </div>
-    <!-- END Questions Sidebar -->
-
   </div>
 </div>

@@ -2,20 +2,16 @@
 /* Top Navigation Bar */
 /* ========================== */
 .app-navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
   background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 0 2rem;
   height: 70px;
   direction: rtl;
 
   .navbar-right {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    cursor: pointer;
 
     .logo-container {
       display: flex;
@@ -23,7 +19,6 @@
       justify-content: center;
       width: 48px;
       height: 48px;
-      background: rgba(255, 255, 255, 0.15);
       border-radius: 12px;
       backdrop-filter: blur(10px);
 
@@ -34,7 +29,6 @@
         color: white;
       }
     }
-
     .app-title {
       font-size: 1.5rem;
       font-weight: 600;

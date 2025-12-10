@@ -26,7 +26,7 @@ import { ViewModeService, ViewMode } from './services/view-mode.service';
 })
 
 export class AppComponent implements OnInit {
-  title = 'Call Center Training';
+  title = 'מערכת לתרגול מוקדנים';
   currentViewMode: ViewMode = 'detailed';
   
   constructor(public viewModeService: ViewModeService) {}

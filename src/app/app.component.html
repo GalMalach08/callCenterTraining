@@ -2,11 +2,11 @@
 <mat-toolbar class="app-navbar">
   
   <!-- Right side: Logo + Title -->
-  <div class="navbar-right">
+  <div class="navbar-right" [routerLink]="'questions'">
     <div class="logo-container">
       <mat-icon class="app-logo">headset_mic</mat-icon>
     </div>
-    <span class="app-title">{{ title }}</span>
+    <span class="app-title" >{{ title }}</span>
   </div>
 
   <span class="spacer"></span>
@@ -17,21 +17,11 @@
     <div class="view-mode-toggle">
       <span class="toggle-label">תצוגה:</span>
       
-      <button 
-        mat-icon-button 
-        [class.active]="!isDetailedMode"
-        (click)="toggleViewMode()"
-        matTooltip="תצוגה פשוטה"
-        class="view-btn">
+      <button mat-icon-button [class.active]="!isDetailedMode" (click)="toggleViewMode()" matTooltip="תצוגה פשוטה" class="view-btn">
         <mat-icon>view_list</mat-icon>
       </button>
 
-      <button 
-        mat-icon-button 
-        [class.active]="isDetailedMode"
-        (click)="toggleViewMode()"
-        matTooltip="תצוגה מפורטת"
-        class="view-btn">
+      <button mat-icon-button [class.active]="isDetailedMode" (click)="toggleViewMode()" matTooltip="תצוגה מפורטת" class="view-btn">
         <mat-icon>view_module</mat-icon>
       </button>
     </div>

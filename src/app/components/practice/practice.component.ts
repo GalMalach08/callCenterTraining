@@ -10,12 +10,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { QuestionHelper } from '../../helper/question.helper';
-
 import { TrainingService } from '../../services/training.service';
 import { QuestionService } from '../../services/question.service';
 import { QuestionModel, FeedbackModel, TrainingSessionModel } from '../../models';
 import { MarkdownPipe } from '../../pipes/markdown.pipe';
 import { QuestionCardComponent } from '../question-card/question-card.component';
+import { MatTooltip } from "@angular/material/tooltip";
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-practice',
@@ -31,8 +32,9 @@ import { QuestionCardComponent } from '../question-card/question-card.component'
     MatCardModule,
     MarkdownPipe,
     MatChipsModule,
-    QuestionCardComponent
-  ],
+    QuestionCardComponent,
+    MatTooltip
+],
   templateUrl: './practice.component.html',
   styleUrls: ['./practice.component.scss']
 })
@@ -48,6 +50,7 @@ export class PracticeComponent implements OnInit {
   allQuestions: QuestionModel[] = [];
   visibleQuestionsCount = 2; // Number of cards visible at once
   currentScrollIndex = 0; // Starting index for visible questions
+  private submitSubscription?: Subscription;
 
   feedbackHtml: string = '';
   feedback: FeedbackModel | null = null;
@@ -57,7 +60,7 @@ export class PracticeComponent implements OnInit {
   isSubmitting = false;
   loadAnswer = false;
   copyText: string = "העתק";
-  typingInterval: any;
+
 
 
   // Voice
@@ -85,86 +88,76 @@ export class PracticeComponent implements OnInit {
       this.router.navigate(['/questions']);
       return;
     }
-
-    this.isLoading = true;
-
-    this.questionService.getAllQuestions().subscribe({
-      next: questions => {
+    this.questionService.getAllQuestions().subscribe({next: questions => {
         this.allQuestions = questions;
         this.question = questions.find(q => q.id === id) || null;
-        
-        this.isLoading = false;
-
-        if (!this.question) {
-          this.errorMessage = 'לא נמצא תרחיש מתאים.';
-          this.router.navigate(['/questions']);
-        } else {
           // Set scroll index to show current question
           const currentIndex = this.allQuestions.findIndex(q => q.id === id);
           if (currentIndex !== -1) {
             this.currentScrollIndex = Math.max(0, currentIndex - 1);
           }
         }
-      },
-      error: err => {
-        console.error(err);
-        this.errorMessage = 'שגיאה בטעינת התרחיש.';
-        this.isLoading = false;
       }
-    });
+    );
   }
 
   // ------------------------------------------------------------
-  // Submit Answer → ChatGPT typing effect
-  // ------------------------------------------------------------
-  submitAnswer(): void {
-    if (!this.textAnswer.trim() || !this.question) return;
+// Submit Answer → ChatGPT typing effect
+// ------------------------------------------------------------
+submitAnswer(): void {
+  if (!this.textAnswer.trim() || !this.question) return;
 
-    this.feedbackHtml = '';
-    this.feedback = null;
-    this.isSubmitting = true;
-    this.loadAnswer = true;
-
-    const session: TrainingSessionModel = {
-      questionId: this.question.id,
-      textAnswer: this.textAnswer,
-      submittedAt: new Date()
-    };
-
-    this.trainingService.submitAnswer(session).subscribe({
-      next: feedback => {
-        const text = feedback.rawResponse ?? JSON.stringify(feedback, null, 2);
-        this.startTypingEffect(text);
-      },
-      error: err => {
-        console.error(err);
-        this.loadAnswer = false;
-        this.isSubmitting = false;
-        this.feedbackHtml = 'אירעה שגיאה בשליחת התשובה.';
-      }
-    });
+  // Cancel previous request if still running
+  if (this.submitSubscription) {
+    this.submitSubscription.unsubscribe();
+    this.submitSubscription = undefined;
   }
 
-  startTypingEffect(fullText: string): void {
-    let index = 0;
-    this.feedbackHtml = '';
-    this.isSubmitting = false;
+  this.feedbackHtml = '';
+  this.feedback = null;
+  this.isSubmitting = true;
+  this.loadAnswer = true;
 
-    this.typingInterval = setInterval(() => {
-      this.feedbackHtml += fullText[index];
-      index++;
+  const session: TrainingSessionModel = {
+    questionId: this.question.id,
+    textAnswer: this.textAnswer,
+    submittedAt: new Date()
+  };
 
-      if (index >= fullText.length) {
-        clearInterval(this.typingInterval);
-        this.loadAnswer = false;
-      }
-    }, 12);
+  this.submitSubscription = this.trainingService.submitAnswer(session).subscribe({
+    next: feedback => {
+      const text = feedback.rawResponse ?? JSON.stringify(feedback, null, 2);
+
+      // Set full HTML at once
+      this.feedbackHtml = text;
+
+      // Stop loading (fade animation will run in the template)
+      this.loadAnswer = false;
+      this.isSubmitting = false;
+
+      this.submitSubscription = undefined;
+    },
+    error: err => {
+      console.error(err);
+      this.loadAnswer = false;
+      this.isSubmitting = false;
+      this.feedbackHtml = 'אירעה שגיאה בשליחת התשובה.';
+      this.submitSubscription = undefined;
+    }
+  });
+}
+
+resetAnswer(): void {
+  this.feedbackHtml = '';
+  this.isSubmitting = false;
+  this.loadAnswer = false;
+  if (this.submitSubscription) {
+    this.submitSubscription.unsubscribe();
+    this.submitSubscription = undefined;
   }
+}
 
-  stopTyping(): void {
-    clearInterval(this.typingInterval);
-    this.loadAnswer = false;
-  }
+
 
   // ------------------------------------------------------------
   // Voice Input
@@ -244,6 +237,12 @@ export class PracticeComponent implements OnInit {
     getDifficultyColor(difficulty: string): string {
       return QuestionHelper.getDifficultyColor(difficulty);
     }
+
+      
+  // Translates difficulty to Hebrew
+  translateDifficulty(difficulty: string): string {
+    return QuestionHelper.translateDifficulty(difficulty);
+  }
 
   goBack(): void {
     this.router.navigate(['/questions']);
