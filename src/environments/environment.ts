@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
   useMockData: true,
-  apiUrl: 'http://localhost:5000/api'
+  apiUrl: "http://localhost:8002"
 };
+

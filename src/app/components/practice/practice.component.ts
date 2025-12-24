@@ -34,7 +34,7 @@ import { Subscription } from 'rxjs';
     MatChipsModule,
     QuestionCardComponent,
     MatTooltip
-],
+  ],
   templateUrl: './practice.component.html',
   styleUrls: ['./practice.component.scss']
 })
@@ -73,7 +73,7 @@ export class PracticeComponent implements OnInit {
     private router: Router,
     private questionService: QuestionService,
     private trainingService: TrainingService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadQuestion();
@@ -88,74 +88,81 @@ export class PracticeComponent implements OnInit {
       this.router.navigate(['/questions']);
       return;
     }
-    this.questionService.getAllQuestions().subscribe({next: questions => {
+    this.questionService.getAllQuestions().subscribe({
+      next: questions => {
         this.allQuestions = questions;
         this.question = questions.find(q => q.id === id) || null;
-          // Set scroll index to show current question
-          const currentIndex = this.allQuestions.findIndex(q => q.id === id);
-          if (currentIndex !== -1) {
-            this.currentScrollIndex = Math.max(0, currentIndex - 1);
-          }
+        // Set scroll index to show current question
+        const currentIndex = this.allQuestions.findIndex(q => q.id === id);
+        if (currentIndex !== -1) {
+          this.currentScrollIndex = Math.max(0, currentIndex - 1);
         }
       }
+    }
     );
   }
 
   // ------------------------------------------------------------
-// Submit Answer → ChatGPT typing effect
-// ------------------------------------------------------------
-submitAnswer(): void {
-  if (!this.textAnswer.trim() || !this.question) return;
+  // Submit Answer → ChatGPT typing effect
+  // ------------------------------------------------------------
+  submitAnswer(): void {
+    if (!this.textAnswer.trim() || !this.question) return;
 
-  // Cancel previous request if still running
-  if (this.submitSubscription) {
-    this.submitSubscription.unsubscribe();
-    this.submitSubscription = undefined;
-  }
-
-  this.feedbackHtml = '';
-  this.feedback = null;
-  this.isSubmitting = true;
-  this.loadAnswer = true;
-
-  const session: TrainingSessionModel = {
-    questionId: this.question.id,
-    textAnswer: this.textAnswer,
-    submittedAt: new Date()
-  };
-
-  this.submitSubscription = this.trainingService.submitAnswer(session).subscribe({
-    next: feedback => {
-      const text = feedback.rawResponse ?? JSON.stringify(feedback, null, 2);
-
-      // Set full HTML at once
-      this.feedbackHtml = text;
-
-      // Stop loading (fade animation will run in the template)
-      this.loadAnswer = false;
-      this.isSubmitting = false;
-
-      this.submitSubscription = undefined;
-    },
-    error: err => {
-      console.error(err);
-      this.loadAnswer = false;
-      this.isSubmitting = false;
-      this.feedbackHtml = 'אירעה שגיאה בשליחת התשובה.';
+    // Cancel previous request if still running
+    if (this.submitSubscription) {
+      this.submitSubscription.unsubscribe();
       this.submitSubscription = undefined;
     }
-  });
-}
 
-resetAnswer(): void {
-  this.feedbackHtml = '';
-  this.isSubmitting = false;
-  this.loadAnswer = false;
-  if (this.submitSubscription) {
-    this.submitSubscription.unsubscribe();
-    this.submitSubscription = undefined;
+    this.feedbackHtml = '';
+    this.feedback = null;
+    this.isSubmitting = true;
+    this.loadAnswer = true;
+
+    const session = {
+      questionId: this.question.id,
+      textAnswer: this.textAnswer,
+      submittedAt: new Date()
+    };
+
+    this.submitSubscription = this.trainingService
+      .submitAnswer(session)
+      .subscribe({
+
+        next: feedback => {
+            const text =
+              `ציון: ${feedback.score}\n` +
+              `משוב: ${feedback.feedback}\n` +
+              `תשובה משופרת: ${feedback.improved_answer}`;
+
+          // Set full HTML at once
+          this.feedbackHtml = text;
+
+          // Stop loading (fade animation will run in the template)
+          this.loadAnswer = false;
+          this.isSubmitting = false;
+
+          this.submitSubscription = undefined;
+        },
+        error: err => {
+          console.error(err);
+          this.loadAnswer = false;
+          this.isSubmitting = false;
+          this.feedbackHtml = 'אירעה שגיאה בשליחת התשובה.';
+          this.submitSubscription = undefined;
+        }
+      });
   }
-}
+
+  resetAnswer(): void {
+    this.feedbackHtml = '';
+    this.isSubmitting = false;
+    this.loadAnswer = false;
+    if (this.submitSubscription) {
+      this.submitSubscription.unsubscribe();
+      this.submitSubscription = undefined;
+    }
+  }
 
 
 
@@ -221,10 +228,10 @@ resetAnswer(): void {
   copyResponse(): void {
     navigator.clipboard.writeText(this.feedbackHtml || '')
       .catch(err => console.error('Copy failed:', err));
-      this.copyText = "הועתק!"
-      setTimeout(() => {
-        this.copyText = "העתק"
-      }, 2000);
+    this.copyText = "הועתק!"
+    setTimeout(() => {
+      this.copyText = "העתק"
+    }, 2000);
   }
 
   adjustTextareaHeight(): void {
@@ -233,12 +240,12 @@ resetAnswer(): void {
     tx.style.height = Math.min(tx.scrollHeight, 200) + 'px';
   }
 
-    // Returns color class for difficulty chip
-    getDifficultyColor(difficulty: string): string {
-      return QuestionHelper.getDifficultyColor(difficulty);
-    }
+  // Returns color class for difficulty chip
+  getDifficultyColor(difficulty: string): string {
+    return QuestionHelper.getDifficultyColor(difficulty);
+  }
 
-      
+
   // Translates difficulty to Hebrew
   translateDifficulty(difficulty: string): string {
     return QuestionHelper.translateDifficulty(difficulty);
@@ -251,7 +258,7 @@ resetAnswer(): void {
   // ------------------------------------------------------------
   // Questions Sidebar Navigation
   // ------------------------------------------------------------
-  
+
   // Get visible questions for carousel
   get visibleQuestions(): QuestionModel[] {
     return this.allQuestions.slice(
@@ -294,7 +301,7 @@ resetAnswer(): void {
     this.feedback = null;
     this.isSubmitting = false;
     this.loadAnswer = false;
-    
+
     // Navigate to new question
     this.router.navigate(['/practice', questionId]).then(() => {
       // Reload the question
