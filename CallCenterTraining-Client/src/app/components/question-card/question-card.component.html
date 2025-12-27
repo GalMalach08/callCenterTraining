@@ -1,0 +1,30 @@
+<mat-card class="question-card" [class.simple-view]="isSimpleView" (click)="onActionClick($event)">
+
+  <!-- Card header with title and category -->
+  <mat-card-header>
+    <mat-card-title class="card-title">
+      <div class="title">
+        <h3>{{ question.title }}</h3>
+        <p class="sub-title" *ngIf="!isSimpleView">{{ question.category }}</p>
+      </div>
+
+      <!-- Difficulty chip section (only in detailed view) -->
+      <div class="chips-container" *ngIf="shouldShowChips">
+        <mat-chip-set>
+          <mat-chip [class]="getDifficultyColor(question.difficulty)">
+            {{ translateDifficulty(question.difficulty) }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+
+
+  <!-- Card actions containing the action button -->
+  <mat-card-actions>
+    <button mat-raised-button class="primary-btn">
+      {{ buttonText }}
+    </button>
+  </mat-card-actions>
+
+</mat-card>

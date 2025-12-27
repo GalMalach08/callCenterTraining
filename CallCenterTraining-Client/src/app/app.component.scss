@@ -1,0 +1,140 @@
+/* ========================== */
+/* Top Navigation Bar */
+/* ========================== */
+.app-navbar {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  height: 70px;
+  direction: rtl;
+
+  .navbar-right {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+
+      .app-logo {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        color: white;
+      }
+    }
+    .app-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  .navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .view-mode-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 24px;
+      backdrop-filter: blur(10px);
+
+      .toggle-label {
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin-left: 8px;
+      }
+
+      .view-btn {
+        width: 40px;
+        height: 40px;
+        color: rgba(255, 255, 255, 0.7);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.15);
+          color: white;
+        }
+
+        &.active {
+          background: white;
+          color: #667eea;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+          mat-icon {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Main content area */
+.app-content {
+  padding: 0;
+  min-height: calc(100vh - 70px);
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .app-navbar {
+    padding: 0 1rem;
+    height: 64px;
+
+    .navbar-right {
+      gap: 0.5rem;
+
+      .logo-container {
+        width: 40px;
+        height: 40px;
+
+        .app-logo {
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+        }
+      }
+
+      .app-title {
+        font-size: 1.1rem;
+      }
+    }
+
+    .navbar-left {
+      .view-mode-toggle {
+        padding: 4px 8px;
+
+        .toggle-label {
+          font-size: 0.85rem;
+        }
+
+        .view-btn {
+          width: 36px;
+          height: 36px;
+        }
+      }
+    }
+  }
+
+  .app-content {
+    min-height: calc(100vh - 64px);
+  }
+}

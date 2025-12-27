@@ -1,0 +1,447 @@
+/* Main layout container */
+.main-container {
+  padding: 2rem;
+}
+
+/* Main practice page wrapper */
+.practice-container {
+  direction: rtl;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+
+  /* Back button style */
+  .back-btn {
+    margin-bottom: 1rem;
+    color: black;
+
+    mat-icon {
+      margin-left: 0.5rem;
+    }
+  }
+
+  /* Force card header colors */
+  mat-card-header {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Main vertical content layout */
+  .practice-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Question details box styling */
+  .question-details {
+    background: #ffffff;
+    border-right: 4px solid #5c6bc0;
+    border-left: 4px solid #5c6bc0;
+    padding: 12px;
+    border-radius: 10px;
+
+    /* Main title row inside question details */
+    .main-title {
+      display: flex;
+      align-items: center;
+
+      mat-icon {
+        margin-top: 8px;
+      }
+    }
+
+    /* Subtitle spacing */
+    .sub-title {
+      margin: 0 40px 0 0;
+    }
+
+    /* Scenario text styles */
+    .scenario-card {
+      h3 {
+        font-size: 1.1rem;
+        color: #3949ab;
+        margin: 0;
+      }
+
+      p {
+        margin-top: 0.4rem;
+        color: #555;
+        line-height: 1.6;
+      }
+    }
+  }
+
+  /* ========================== */
+  /* Chat Section               */
+  /* ========================== */
+
+  /* Chat section wrapper */
+  .chat-section {
+    margin-top: 1rem;
+  }
+
+  /* Input bar layout (textarea + buttons) */
+  .input-bar {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+  }
+
+  /* Textarea wrapper */
+  .prompt-field {
+    width: 100%;
+
+    textarea {
+      resize: none;
+      min-height: 48px;
+      font-size: 15px;
+      line-height: 22px;
+    }
+  }
+
+  /* Round buttons next to textarea (mic / send / abort) */
+  .chatgpt-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+
+    button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    /* Mic icon button */
+    .mic-button {
+      background: white;
+      border: 1px solid #ccc;
+      color: #555;
+
+      &:hover {
+        background: #f3f3f3;
+      }
+       // Disabled state
+      &:disabled,
+      &.mdc-icon-button--disabled {  // MDC auto class
+        opacity: 0.35;
+        cursor: auto;
+        border-color: #888 !important;
+        mat-icon {
+          color: #888 !important;
+        }
+      }
+
+    }
+
+    /* Send icon button */
+    .send-button {
+      background: black;
+      color: white;
+      border: none !important;
+
+      &:hover {
+        background: #333;
+      }
+
+      &:disabled {
+        background: #ccc;
+        cursor: auto;
+        color: white;
+      }
+    }
+
+    /* Abort icon button */
+    .abort-button {
+      background: black;
+      color: white;
+
+      mat-icon {
+        color: white;
+      }
+    }
+  }
+
+  /* Voice recording textarea state */
+  .recording-field {
+    position: relative;
+    width: 100%;
+
+    textarea {
+      width: 100%;
+      resize: none;
+      border: 1px solid #2196f3;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    /* Confirm / cancel buttons inside recording textarea */
+    .confirm-buttons-inline {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 6px;
+
+      .cancel-button {
+        background: #eee;
+      }
+
+      .confirm-button {
+        background: black;
+        color: white;
+      }
+    }
+  }
+
+  /* ========================== */
+  /* Feedback Box (response)    */
+  /* ========================== */
+
+  /* Response container */
+  .response-box {
+    margin-top: 1.5rem;
+    background: #f7f7f7;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #ddd;
+
+    /* Header row (title + status) */
+    .response-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+    }
+
+    /* HTML content styling */
+    .response-html {
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    /* Loading dot animation */
+    .loading-dot {
+      width: 12px;
+      height: 12px;
+      background: black;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 0.5s alternate infinite;
+    }
+  }
+
+  /* ========================== */
+  /* Questions Sidebar Carousel */
+  /* ========================== */
+
+  /* Sidebar wrapper */
+  .questions-sidebar {
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    // height: 330px;
+
+    /* Sidebar header row */
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+
+      h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #333;
+        font-weight: 600;
+      }
+
+      .questions-count {
+        font-size: 0.9rem;
+        color: #667eea;
+        font-weight: 500;
+        background: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        border: 1px solid #667eea;
+      }
+    }
+
+    /* Carousel main layout */
+    .carousel-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+
+      /* Previous / next round buttons */
+      .carousel-btn {
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        background: white;
+        color: #667eea;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+        display: flex;
+        justify-content: center;
+
+        &:hover:not([disabled]) {
+          background: #667eea;
+          color: white;
+          // transform: scale(1.1);
+        }
+
+        &:disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+        }
+
+        mat-icon {
+          font-size: 28px;
+        }
+      }
+
+      /* Grid of question cards inside carousel */
+      .carousel-track {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        overflow: hidden;
+
+        /* Single item wrapper */
+        .carousel-item {
+          transition: all 0.3s ease;
+
+          /* Selected item highlight */
+          &.selected {
+            ::ng-deep app-question-card .question-card {
+              border: 3px solid #667eea !important;
+              box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+
+              mat-card-header {
+                // Optional gradient background for selected header
+              }
+
+              mat-card-actions button {
+                background: #667eea;
+                pointer-events: none;
+              }
+            }
+          }
+
+          /* Base question card override inside carousel */
+          ::ng-deep app-question-card .question-card {
+            height: 100%;
+            cursor: pointer;
+
+            &:hover {
+              box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            }
+
+            mat-card-content {
+              min-height: 60px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Pulse animation for loading dot */
+@keyframes pulse {
+  from {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================== */
+/* Responsive: tablets / mid  */
+/* ========================== */
+@media (max-width: 1024px) {
+  .practice-container {
+    .questions-sidebar {
+      .carousel-container {
+        .carousel-track {
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+      }
+    }
+  }
+}
+
+/* ========================== */
+/* Responsive: mobile phones  */
+/* ========================== */
+@media (max-width: 768px) {
+  .practice-container {
+    padding: 1rem;
+
+    .questions-sidebar {
+      padding: 1rem;
+
+      .carousel-container {
+        gap: 0.5rem;
+
+        .carousel-btn {
+          width: 36px;
+          height: 36px;
+
+          mat-icon {
+            font-size: 24px;
+          }
+        }
+
+        .carousel-track {
+          grid-template-columns: 1fr;
+          gap: 0.75rem;
+        }
+      }
+    }
+  }
+}
+
+.fix-icon-btn {
+  border-radius: 50% !important;
+  border: 2px solid #000 !important;
+  padding: 0 !important;
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.35s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

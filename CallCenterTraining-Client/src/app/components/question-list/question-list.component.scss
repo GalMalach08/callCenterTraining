@@ -1,0 +1,197 @@
+.question-list-container {
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  direction: rtl;
+
+  .header {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: #1565c0;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.7;
+      margin-top: 0.5rem;
+    }
+  }
+
+  .filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    direction: rtl;
+
+}
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+}
+
+  /* 🎯 Grid of Cards */
+  .questions-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  }
+
+  // Question card styles moved to question-card.component.scss
+
+  .empty-state {
+  padding: 3rem 0;
+  min-height: 250px; /* 🟢 מונע חיתוך */
+  opacity: 0.7;
+
+  mat-icon {
+    font-size: 64px;
+    height: 64px;      /* 🟢 חובה */
+    width: 64px;       /* 🟢 חובה */
+    line-height: 64px; /* 🟢 מוודא שהאייקון לא קופץ למעלה */
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+}
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .question-list-container {
+    padding: 1rem;
+
+    .header h1 {
+      font-size: 1.8rem;
+    }
+  }
+}
+
+
+
+    .filter-section {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      .filter-label {
+        font-weight: 500;
+        color: #555;
+      }
+
+        // Input field width
+.input-field {
+  height: 40px; 
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  ::ng-deep input.mat-input-element {
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 40px;
+    line-height: 40px;
+  }
+  .cancel-icon {
+    color: rgb(243, 87, 87);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0px 6px;
+
+    
+  }
+}
+
+
+   .difficulty-chips {
+        display: flex;
+        gap: 0.5rem;
+        ::ng-deep {
+          .info.mat-mdc-chip-selected {
+            background-color: #2196f3 !important;
+            color: white !important;
+          }
+
+         
+      }
+    }
+  }
+
+
+
+/* Wrapper for all difficulty items */
+.difficulty-wrapper {
+  display: flex;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+    height: 36px; /* Fixes the height to compact size */
+
+}
+
+/* Each difficulty chip-like item */
+.difficulty-item {
+  // flex: 1;
+  padding: 10px 14px;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+
+  transition: background 0.2s ease, color 0.2s ease;
+
+  /* Vertical divider between items */
+  border-right: 1px solid #dcdcdc;
+}
+
+/* Remove divider from last item */
+.difficulty-item:last-child {
+  border-right: none;
+}
+
+/* Hover effect */
+.difficulty-item:hover {
+  background: #f3f3f3;
+}
+
+/* Style for selected item */
+.difficulty-item.selected {
+background: linear-gradient(135deg, #1565c0, #42a5f5);
+  color: white;
+  font-weight: bold;
+}
+
+/* Check icon inside selected chip */
+.check-icon {
+  font-size: 18px;
+  margin-right: 6px;
+}
+
+  // רקע לבן לחלון הבחירה
+  ::ng-deep .mat-mdc-select-panel {
+    background: #ffffff !important;
+  }

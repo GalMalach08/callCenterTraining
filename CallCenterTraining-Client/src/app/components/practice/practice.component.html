@@ -1,0 +1,176 @@
+<div class="main-container">
+  <div class="practice-container">
+    <div class="practice-content" *ngIf="!isLoading && question">
+
+      <!-- ========================= -->
+      <!-- Question Header Section   -->
+      <!-- ========================= -->
+      <div class="question-details">
+        <mat-card-header>
+          <mat-card-title class="card-title">
+
+            <div class="title">
+              <div class="main-title">
+                <!-- Back button -->
+                <button mat-icon-button   matTooltip="חזרה לרשימת השאלות"  class="back-btn"(click)="goBack()" >
+                  <mat-icon>arrow_forward</mat-icon>
+                </button>
+                <h3>{{ question.title }}</h3>
+              </div>
+
+              <p class="sub-title">{{ question.category }}</p>
+            </div>
+
+            <!-- Difficulty chip -->
+            <div class="chips-container">
+              <mat-chip-set>
+                <mat-chip [class]="getDifficultyColor(question.difficulty)">
+                  {{ translateDifficulty(question.difficulty) }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+
+          </mat-card-title>
+        </mat-card-header>
+      </div>
+      <!-- END Question Header -->
+
+      <!-- ========================= -->
+      <!-- ChatGPT-Style Answer UI   -->
+      <!-- ========================= -->
+      <div class="chat-section">
+
+        <!-- Input Bar -->
+        <div class="input-bar">
+          <mat-form-field appearance="outline" class="prompt-field">
+
+            <textarea matInput [(ngModel)]="textAnswer" #textareaElement
+                      (input)="adjustTextareaHeight()" (keydown)="handleEnterKey($event)"
+                      rows="2" placeholder="כתוב את תשובתך כאן..."
+                      [disabled]="isSubmitting"></textarea>
+
+            <!-- Buttons -->
+            <div matSuffix class="chatgpt-buttons">
+
+              <!-- Normal Mode -->
+              <ng-container *ngIf="!isListening; else recordMode">
+
+                <!-- Mic -->
+                <button class="mic-button fix-icon-btn" matTooltip="הקלטה קולית"
+                        (click)="startVoiceInput()" [disabled]="isSubmitting">
+                  <mat-icon>mic</mat-icon>
+                </button>
+
+                <!-- Send -->
+                <button class="send-button fix-icon-btn" (click)="submitAnswer()"
+                        *ngIf="!loadAnswer" [disabled]="!textAnswer.trim() || isSubmitting">
+                  <mat-icon>arrow_upward</mat-icon>
+                </button>
+
+                <!-- Stop typing -->
+                <button class="abort-button fix-icon-btn" *ngIf="isSubmitting" (click)="resetAnswer()">
+                  <mat-icon>stop</mat-icon>
+                </button>
+
+              </ng-container>
+
+              <!-- Recording Mode -->
+              <ng-template #recordMode>
+                <div class="recording-field">
+
+                  <textarea matInput [value]="recognizedText" rows="2" readonly></textarea>
+
+                  <div class="confirm-buttons-inline">
+
+                    <button class="cancel-button fix-icon-btn" (click)="cancelVoice()">
+                      <mat-icon>close</mat-icon>
+                    </button>
+
+                    <button class="confirm-button fix-icon-btn" (click)="confirmVoice()">
+                      <mat-icon>check</mat-icon>
+                    </button>
+
+                  </div>
+                </div>
+              </ng-template>
+
+            </div>
+          </mat-form-field>
+        </div>
+
+        <!-- ========================= -->
+        <!-- AI Feedback Box          -->
+        <!-- ========================= -->
+        <div class="response-box" *ngIf="feedbackHtml || loadAnswer">
+
+          <div class="response-header sticky-header">
+            <h3>משוב AI</h3>
+
+            <button mat-button (click)="copyResponse()" matTooltip="העתק">
+              {{ copyText }}
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </div>
+
+          <!-- Loading -->
+          <ng-container *ngIf="loadAnswer">
+            <span class="loading-dot"></span>
+          </ng-container>
+
+          <!-- Fade In Answer -->
+          <div *ngIf="!loadAnswer"
+              class="response-html fade-in"
+              [innerHTML]="feedbackHtml | markdownToHtml">
+          </div>
+
+        </div>
+
+      </div>
+      <!-- END Chat Section -->
+
+      <!-- ========================= -->
+      <!-- Questions Sidebar        -->
+      <!-- ========================= -->
+      <div class="questions-sidebar" *ngIf="allQuestions.length > 0">
+
+        <div class="sidebar-header">
+          <h3>תרחישים נוספים לתרגול</h3>
+          <span class="questions-count">{{ allQuestions.length }} תרחישים</span>
+        </div>
+
+        <div class="carousel-container">
+
+          <!-- Prev -->
+          <button mat-icon-button disableRipple class="carousel-btn  prev-btn"
+                  [disabled]="!canScrollPrev" (click)="scrollPrev()" matTooltip="תרחיש קודם">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+
+          <!-- Cards -->
+          <div class="carousel-track">
+            <div *ngFor="let q of visibleQuestions"
+                 class="carousel-item"
+                 [class.selected]="isQuestionSelected(q.id)">
+
+              <app-question-card [question]="q"
+                                 [buttonText]="isQuestionSelected(q.id) ? 'נבחר' : 'בחר תרחיש'"
+                                 (actionClick)="selectQuestion($event)">
+              </app-question-card>
+
+            </div>
+          </div>
+
+          <!-- Next -->
+          <button mat-icon-button disableRipple class="carousel-btn next-btn"
+                  [disabled]="!canScrollNext" (click)="scrollNext()" matTooltip="תרחיש הבא">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+        </div>
+
+      </div>
+      <!-- END Questions Sidebar -->
+
+    </div>
+  </div>
+</div>

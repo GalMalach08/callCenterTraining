@@ -1,0 +1,106 @@
+<!-- Main container for the question list page -->
+<div class="question-list-container">
+
+  <!---- Header section displaying title and subtitle ---->
+  <div class="header">
+    <h1>תרחישי תרגול למוקדנים</h1>
+    <p class="subtitle">נא לבחור תרחיש כדי להתחיל תרגול</p>
+  </div>
+
+  <!---- Filters section including search and difficulty filter ---->
+  <div class="filters">
+
+    <!-- Text search filter -->
+    <div class="filter-section">
+      <span class="filter-label">חיפוש:</span>
+      <mat-form-field appearance="outline" class="input-field">
+        <input matInput [(ngModel)]="searchText" placeholder="טקסט חופשי">
+        <mat-icon *ngIf="searchText" matSuffix (click)="searchText=''" class="cancel-icon">
+          close
+        </mat-icon>
+      </mat-form-field>
+    </div>
+
+    <!-- Category filter -->
+<div class="filter-section">
+  <span class="filter-label">סינון לפי קטגוריה:</span>
+  <mat-form-field appearance="outline" class="input-field">
+    <mat-select
+      [(ngModel)]="selectedCategories"
+      multiple
+      placeholder="בחירת קטגוריות" >
+      <mat-option *ngFor="let cat of categories" [value]="cat">
+        {{ cat }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+
+    <!-- Difficulty filter chips section -->
+    <div class="filter-section">
+      <span class="filter-label">סינון לפי רמת קושי:</span>
+      <div class="difficulty-wrapper">
+        <div
+          class="difficulty-item"
+          *ngFor="let diff of difficultyLevels"
+          [class.selected]="difficultyFilter === diff.code"
+          (click)="setDifficulty(diff.code)">
+          <span>{{ diff.name }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!---- Questions grid displaying each scenario card ---->
+  <div class="questions-grid" *ngIf="!isLoading && !errorMessage && filteredQuestions.length > 0">
+    
+    <!-- Using the modular question-card component -->
+    <app-question-card
+      *ngFor="let question of filteredQuestions"
+      [question]="question"
+      [buttonText]="'התחלת תרגול'"
+      (actionClick)="selectQuestion($event)">
+    </app-question-card>
+  </div>
+
+  <!-- Empty state when filters return no results but there are questions -->
+  <div
+    class="empty-state"
+    *ngIf="!isLoading && !errorMessage && questions.length > 0 && filteredQuestions.length === 0">
+    <mat-icon>search_off</mat-icon>
+    <p>לא נמצאו תרחישים התואמים למסננים שנבחרו.</p>
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="resetFilters()">
+      איפוס מסננים
+    </button>
+  </div>
+
+  <!-- Empty state shown when there are no scenarios at all -->
+  <div
+    class="empty-state"
+    *ngIf="!isLoading && !errorMessage && questions.length === 0">
+    <mat-icon>inbox</mat-icon>
+    <p>לא קיימים תרחישים זמינים במערכת בשלב זה.</p>
+  </div>
+
+  <!-- Loading spinner section shown while fetching data -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+    <p>Loading scenarios...</p>
+  </div>
+
+  <!-- Error display section shown when data fails to load -->
+  <div class="error-container" *ngIf="errorMessage">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ errorMessage }}</p>
+    <button mat-raised-button color="primary" (click)="loadQuestions()">
+      <mat-icon>refresh</mat-icon>
+      Retry
+    </button>
+  </div>
+
+</div>
