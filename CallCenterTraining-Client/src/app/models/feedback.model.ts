@@ -1,8 +1,6 @@
-export interface FeedbackModel {
+export interface FeedbackResponseModel {
   score: number;
-  strengths: string[];
-  weaknesses: string[];
-  suggestions: string[];
-  rawResponse?: string;
-  evaluatedAt: Date;
+  feedback: string;
+  improved_answer: string;
 }
+   

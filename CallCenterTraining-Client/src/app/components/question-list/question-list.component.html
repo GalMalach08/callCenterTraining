@@ -54,7 +54,7 @@
   </div>
 
   <!---- Questions grid displaying each scenario card ---->
-  <div class="questions-grid" *ngIf="!isLoading && !errorMessage && filteredQuestions.length > 0">
+  <div class="questions-grid" *ngIf="!isLoading && errorMessage.length === 0 && filteredQuestions.length > 0">
     
     <!-- Using the modular question-card component -->
     <app-question-card
@@ -68,7 +68,7 @@
   <!-- Empty state when filters return no results but there are questions -->
   <div
     class="empty-state"
-    *ngIf="!isLoading && !errorMessage && questions.length > 0 && filteredQuestions.length === 0">
+    *ngIf="!isLoading && errorMessage.length === 0 && questions.length > 0 && filteredQuestions.length === 0">
     <mat-icon>search_off</mat-icon>
     <p>לא נמצאו תרחישים התואמים למסננים שנבחרו.</p>
     <button
@@ -80,9 +80,7 @@
   </div>
 
   <!-- Empty state shown when there are no scenarios at all -->
-  <div
-    class="empty-state"
-    *ngIf="!isLoading && !errorMessage && questions.length === 0">
+  <div class="empty-state" *ngIf="!isLoading && errorMessage.length === 0 && questions.length === 0">
     <mat-icon>inbox</mat-icon>
     <p>לא קיימים תרחישים זמינים במערכת בשלב זה.</p>
   </div>
@@ -90,16 +88,16 @@
   <!-- Loading spinner section shown while fetching data -->
   <div class="loading-container" *ngIf="isLoading">
     <mat-spinner></mat-spinner>
-    <p>Loading scenarios...</p>
+    <p>טוען תרחישים</p>
   </div>
 
   <!-- Error display section shown when data fails to load -->
-  <div class="error-container" *ngIf="errorMessage">
+  <div class="error-container" *ngIf="errorMessage.length > 0">
     <mat-icon color="warn">error</mat-icon>
-    <p>{{ errorMessage }}</p>
+    <!-- for loop ! -->
+    <p *ngFor="let error of errorMessage">{{ error }}</p>
     <button mat-raised-button color="primary" (click)="loadQuestions()">
-      <mat-icon>refresh</mat-icon>
-      Retry
+      ניסיון חוזר
     </button>
   </div>
 

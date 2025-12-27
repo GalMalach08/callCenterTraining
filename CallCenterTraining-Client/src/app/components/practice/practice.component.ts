@@ -12,7 +12,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { QuestionHelper } from '../../helper/question.helper';
 import { TrainingService } from '../../services/training.service';
 import { QuestionService } from '../../services/question.service';
-import { QuestionModel, FeedbackModel, TrainingSessionModel } from '../../models';
+import { QuestionModel, AnswerRequest, FeedbackResponseModel } from '../../models';
 import { MarkdownPipe } from '../../pipes/markdown.pipe';
 import { QuestionCardComponent } from '../question-card/question-card.component';
 import { MatTooltip } from "@angular/material/tooltip";
@@ -53,7 +53,7 @@ export class PracticeComponent implements OnInit {
   private submitSubscription?: Subscription;
 
   feedbackHtml: string = '';
-  feedback: FeedbackModel | null = null;
+  feedback: FeedbackResponseModel | null = null;
 
   isLoading = false;
   errorMessage = '';
@@ -80,7 +80,7 @@ export class PracticeComponent implements OnInit {
   }
 
   // ------------------------------------------------------------
-  // Load selected question by ID
+  // Load selected question by ID with caching optimization
   // ------------------------------------------------------------
   loadQuestion(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -88,6 +88,18 @@ export class PracticeComponent implements OnInit {
       this.router.navigate(['/questions']);
       return;
     }
+
+    // Check if we already have cached questions to avoid unnecessary API call
+    if (this.questionService.hasCachedQuestions && this.allQuestions.length > 0) {
+      this.question = this.allQuestions.find(q => q.id === id) || null;
+      const currentIndex = this.allQuestions.findIndex(q => q.id === id);
+      if (currentIndex !== -1) {
+        this.currentScrollIndex = Math.max(0, currentIndex - 1);
+      }
+      return;
+    }
+
+    // Load questions from service (will use cache if available)
     this.questionService.getAllQuestions().subscribe({
       next: questions => {
         this.allQuestions = questions;
@@ -98,8 +110,7 @@ export class PracticeComponent implements OnInit {
           this.currentScrollIndex = Math.max(0, currentIndex - 1);
         }
       }
-    }
-    );
+    });
   }
 
   // ------------------------------------------------------------
@@ -119,17 +130,14 @@ export class PracticeComponent implements OnInit {
     this.isSubmitting = true;
     this.loadAnswer = true;
 
-    const session = {
-      questionId: this.question.id,
-      textAnswer: this.textAnswer,
-      submittedAt: new Date()
+    const answerRequest: AnswerRequest = {
+      question_id: this.question.id,
+      question_text: this.question.title,
+      answer_text: this.textAnswer,
     };
 
-    this.submitSubscription = this.trainingService
-      .submitAnswer(session)
-      .subscribe({
-
-        next: feedback => {
+    this.submitSubscription = this.trainingService.submitAnswer(answerRequest).subscribe({
+        next: (feedback: FeedbackResponseModel) => {
             const text =
               `ציון: ${feedback.score}\n` +
               `משוב: ${feedback.feedback}\n` +
@@ -137,21 +145,21 @@ export class PracticeComponent implements OnInit {
 
           // Set full HTML at once
           this.feedbackHtml = text;
-
-          // Stop loading (fade animation will run in the template)
-          this.loadAnswer = false;
-          this.isSubmitting = false;
-
-          this.submitSubscription = undefined;
+          this.apiCallFinished();
         },
         error: err => {
           console.error(err);
-          this.loadAnswer = false;
-          this.isSubmitting = false;
+          this.apiCallFinished();
           this.feedbackHtml = 'אירעה שגיאה בשליחת התשובה.';
-          this.submitSubscription = undefined;
         }
       });
+  }
+
+
+  apiCallFinished(): void {
+    this.loadAnswer = false;
+    this.isSubmitting = false;
+    this.submitSubscription = undefined;
   }
 
   resetAnswer(): void {

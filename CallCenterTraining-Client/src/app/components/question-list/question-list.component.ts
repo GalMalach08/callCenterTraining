@@ -39,7 +39,7 @@ export class QuestionListComponent implements OnInit {
   questions: QuestionModel[] = [];
 
   isLoading = false;
-  errorMessage = '';
+  errorMessage: string[] = [];
 
   searchText = '';
   difficultyFilter = '';
@@ -65,25 +65,30 @@ export class QuestionListComponent implements OnInit {
     this.loadQuestions();
   }
 
-  // Fetches all questions from the service
+  // Fetches all questions from the service with caching optimization
   loadQuestions = (): void => {
+    // Check if questions are already cached to avoid unnecessary loading
+    if (this.questionService.hasCachedQuestions && this.questions.length > 0) {
+      return; // Skip loading if we already have cached data
+    }
+
     this.isLoading = true;
-    this.errorMessage = '';
+    this.errorMessage = [];
 
     this.questionService.getAllQuestions().subscribe({
       next: (questions) => {
         this.questions = questions;
-          this.categories = Array.from(
-    new Set(
-      this.questions
-        .map(q => q.category)
-        .filter(cat => !!cat)
-    )
-  );
+        this.categories = Array.from(
+          new Set(
+            this.questions
+              .map(q => q.category)
+              .filter(cat => !!cat)
+          )
+        );
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = 'שגיאה, נא לנסות שנית בטעינת התרחישים';
+        this.errorMessage = ['ארעה שגיאה בטעינת התרחישים.', 'נא לנסות שנית ואם הבעיה ממשיכה ניתן לפנות לתמיכה הטכנית של האוניברסיטה.']
         this.isLoading = false;
         console.error('Error loading questions:', error);
       }
