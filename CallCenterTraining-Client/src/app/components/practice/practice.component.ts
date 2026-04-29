@@ -140,9 +140,8 @@ export class PracticeComponent implements OnInit {
         next: (feedback: FeedbackResponseModel) => {
             const text =
               `ציון: ${feedback.score}\n` +
-              `משוב: ${feedback.feedback}\n` +
-              `תשובה משופרת: ${feedback.improved_answer}`;
-
+              `משוב: ${feedback.feedback}\n` 
+              
           // Set full HTML at once
           this.feedbackHtml = text;
           this.apiCallFinished();

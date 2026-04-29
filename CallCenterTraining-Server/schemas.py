@@ -5,10 +5,18 @@ class AnswerRequest(BaseModel):
     question_text: str
     answer_text: str
 
+class Probs(BaseModel):
+    bad: float
+    good: float
+
+class AIResponse(BaseModel):
+    probs: Probs
+    predicted_label: str
+    confidence: float
+
 class FeedbackResponse(BaseModel):
     score: int
     feedback: str
-    improved_answer: str
 
 class Question(BaseModel):
     id: int
